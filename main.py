@@ -1,7 +1,7 @@
 import urllib.request
 import time
 
-def check_speed(url, iterations=10):
+def check_speed(url, iterations=5):
     print(f"Начинаем замер скорости соединения с {url}...")
 
     total_time = 0
@@ -9,7 +9,7 @@ def check_speed(url, iterations=10):
 
     # Заголовки, чтобы сервер не заблокировал запросы и не отдавал кэш
     headers = {
-        'User-Agent': 'Mozilla/5.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
     }
@@ -19,7 +19,7 @@ def check_speed(url, iterations=10):
 
         try:
             start_time = time.perf_counter()
-            with urllib.request.urlopen(req) as response:
+            with urllib.request.urlopen(req, timeout=15) as response:
                 data = response.read()
             end_time = time.perf_counter()
 
@@ -40,13 +40,13 @@ def check_speed(url, iterations=10):
         print("Не удалось скачать данные.")
         return
 
+    # Вычисляем средние значения на основе реально выполненных итераций
     avg_time = total_time / iterations
     total_megabytes = total_bytes / (1024 * 1024)
 
-
+    # Скорость в Мегабайтах в секунду
     speed_mb_per_sec = total_megabytes / total_time
-
-
+    # Скорость в Мегабитах в секунду (в 1 Байте = 8 Бит)
     speed_mbit_per_sec = speed_mb_per_sec * 8
 
     print("\n--- Результаты ---")
@@ -56,5 +56,8 @@ def check_speed(url, iterations=10):
 
 
 if __name__ == "__main__":
-    IMAGE_URL = "https://wikimedia.org" #картинка высокого разрешения
-    check_speed(IMAGE_URL, iterations=10)
+    # Официальный тестовый файл 10MB от Tele2 (вместо главной страницы Wikimedia)
+    TEST_URL = "http://tele2.net"
+
+    # Уменьшено количество итераций до 5, чтобы не скачивать слишком много данных
+    check_speed(TEST_URL, iterations=5)
